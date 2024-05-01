@@ -52,4 +52,5 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-ENTRYPOINT [ "node", "server.js" ]
+ENTRYPOINT ["node"]
+CMD ["server.js"]

@@ -5,11 +5,11 @@ networks:
     driver: bridge
 
 services:
-  api:
+  node-api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: api
+    container_name: node-api
     restart: always
     env_file:
       - .env

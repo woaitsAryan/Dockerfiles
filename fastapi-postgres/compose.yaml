@@ -1,0 +1,72 @@
+version: '3.8'
+
+networks:
+  api-network:
+    driver: bridge
+
+services:
+  python-api:
+    container_name: python-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - ./public:/app/public/
+      - ./log:/app/log/
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://0.0.0.0:${PORT}/ping"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  postgres:
+    image: postgres:16
+    container_name: postgres-db
+    restart: always
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USER}
+      - PGPASSWORD=${DB_PASSWORD}
+      - PGPORT=${DB_PORT}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+     # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - api-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+volumes:
+  postgres:
+    name: postgres-data
+    driver: local

@@ -42,4 +42,5 @@ COPY --from=builder --chown=server_user:nodejs /app/package.json ./package.json
 
 USER server_user
 
-ENTRYPOINT [ "node", "src/index.js" ]
+ENTRYPOINT ["node"]
+CMD ["src/index.js"]
