@@ -27,9 +27,10 @@ services:
       - api-network
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://127.0.0.1:${PORT}/ping"]
-      interval: 5s
+      interval: 1m
       timeout: 5s
       retries: 3
+      start_period: 15s
     logging:
       driver: "json-file"
       options:
@@ -57,9 +58,10 @@ services:
       - api-network
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-d", "${DB_NAME}", "-U", "${DB_USER}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 20s
     logging:
       driver: "json-file"
       options:
@@ -77,9 +79,10 @@ services:
       - api-network
     healthcheck:
       test: ["CMD", "redis-cli", "-p", "${REDIS_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 10s
     logging:
       driver: "json-file"
       options:
