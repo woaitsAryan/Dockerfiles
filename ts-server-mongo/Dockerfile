@@ -6,9 +6,9 @@ FROM base AS deps
 WORKDIR /app
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 RUN \
-    if [ -f yarn.lock ]; then yarn install --frozen-lockfile --production=true; \
-    elif [ -f package-lock.json ]; then npm ci --omit=dev; \
-    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile --prod; \
+    if [ -f yarn.lock ]; then yarn install --frozen-lockfile --production=true && yarn install -D typescript; \
+    elif [ -f package-lock.json ]; then npm ci --omit=dev && npm install -D typescript; \
+    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile --prod && pnpm install -D typescript; \
     else echo "Lockfile not found." && exit 1; \
     fi
 
@@ -18,12 +18,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN 
-
 RUN \
-    if [ -f yarn.lock ]; then yarn install -D typescript && yarn run build; \
-    elif [ -f package-lock.json ]; then npm install -D typescript && npm run build; \
-    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install -D typescript && pnpm run build; \
+    if [ -f yarn.lock ]; then yarn run build; \
+    elif [ -f package-lock.json ]; then npm run build; \
+    elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
     else echo "Lockfile not found." && exit 1; \
     fi
 
